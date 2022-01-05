@@ -8,6 +8,24 @@ from torchvision.transforms import ToTensor
 import numpy as np
 from torchsummary import summary
 
+_DCASE_LABEL_MAP = {
+    "beach": 0,
+    "bus": 1,
+    "cafe/restaurant": 2,
+    "car": 3,
+    "city_center": 4,
+    "forest_path": 5,
+    "grocery_store": 6,
+    "home": 7,
+    "library": 8,
+    "metro_station": 9,
+    "office": 10,
+    "park": 11,
+    "residential_area": 12,
+    "train": 13,
+    "tram": 14
+}
+
 class Dcase2013(Dataset):
 
   def __init__(self, path, class_map):

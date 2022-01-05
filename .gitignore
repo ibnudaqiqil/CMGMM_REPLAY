@@ -1,1 +1,9 @@
 data/*
+datasets/*
+runs/*
+store/*
+output/*
+*.gz
+*.pickle
+*.pkl
+continualai/*
