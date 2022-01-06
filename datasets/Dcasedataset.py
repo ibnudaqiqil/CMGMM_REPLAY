@@ -17,7 +17,7 @@ class ToMono:
         output = torch.mean(
             x, dim=0) if self.channel_first else torch.mean(x, dim=1)
         return output
-        
+
 #dataset for DCAE
 class DCaseDataset(Dataset):
   
@@ -114,8 +114,9 @@ class DCaseDataset(Dataset):
         # Load data
         filepath = self.root_dir + self.file_names[index]
         sound, sfreq = torchaudio.load(filepath)
-        assert sound.shape[0] == 1, "Expected mono channel"
-        sound = torch.mean(sound, dim=0)
+        print( sound.shape)
+        sound = torch.mean(sound, dim=1)
+        print( sound.shape)
         assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
     
         # Remove last samples if longer than expected

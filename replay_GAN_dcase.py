@@ -52,12 +52,12 @@ if __name__ == "__main__":
     train_dataset = DCaseDataset(
         current_dir + "/data/TUT-acoustic-scenes-2017-development/",
         split="train",
-        transform=ToMono()
+       
     )
     test_dataset = DCaseDataset(
         current_dir + "/data/TUT-acoustic-scenes-2017-development/",
         split="val",
-        transform=ToMono()
+        
     )
     loader_train = DataLoader(
         train_dataset,
