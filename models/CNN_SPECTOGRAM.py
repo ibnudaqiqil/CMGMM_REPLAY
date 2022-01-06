@@ -297,7 +297,7 @@ class Cnn(nn.Module):
 
         # Normalise mel spectrogram
         x = x.transpose(1, 3)
-        x = self.bn0(x)
+        #x = self.bn0(x)
         x = x.transpose(1, 3)
 
         # Masking
