@@ -86,22 +86,7 @@ if __name__ == "__main__":
     print("\n\nNet at training time")
     print(net)
     print("Nb. of parameters at training time: ", net.get_nb_parameters() / 1e3, "k")
-    # tasks to use
-    task_classes_arr = [(0, 1), (2, 3), (4, 5), (6, 7), (8, 9)]
-    tasks_num = len(task_classes_arr)  # 5
-    task_data = []
-    task_data_with_overlap = []
-    print(len(train_dataset))
-    for i, task_classes in enumerate(task_classes_arr):
-        train_mask = np.isin(train_dataset, task_classes)
-        print(train_mask)
-        test_mask = np.isin(test_dataset, task_classes)
-        x_train_task, t_train_task = train_dataset[train_mask]
-        x_test_task, t_test_task = test_dataset[test_mask]
 
-        task_data.append((x_train_task, t_train_task, x_test_task, t_test_task))
-        task_data_with_overlap.append((x_train_task, t_train_task - (i * 2),
-                                        x_test_task, t_test_task - (i * 2)))
     # ---
     optim = torch.optim.AdamW(
         [
