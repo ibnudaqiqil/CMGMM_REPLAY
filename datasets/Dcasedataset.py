@@ -7,28 +7,39 @@ from torch.utils.data import Dataset
 class DCaseDataset(Dataset):
   
     labelind2name = {
-        0: "airport",
+        0: "beach",
         1: "bus",
-        2: "metro",
-        3: "metro_station",
-        4: "park",
-        5: "public_square",
-        6: "shopping_mall",
-        7: "street_pedestrian",
-        8: "street_traffic",
-        9: "tram",
+        2: "cafe/restaurant",
+        3: "car",
+        4: "city_center",
+        5: "forest_path",
+        6: "grocery_store",
+        7: "home",
+        8: "library",
+        9: "metro_station",
+        10: "office",
+        11: "park",
+        12: "residential_area",
+        13: "train",
+        14: "tram",
     }
     name2labelind = {
-        "airport": 0,
+        "beach": 0,
         "bus": 1,
-        "metro": 2,
-        "metro_station": 3,
-        "park": 4,
-        "public_square": 5,
-        "shopping_mall": 6,
-        "street_pedestrian": 7,
-        "street_traffic": 8,
-        "tram": 9,
+        "cafe/restaurant": 2,
+        "car": 3,
+        "city_center": 4,
+        "forest_path": 5,
+        "grocery_store": 6,
+        "home": 7,
+        "library": 8,
+        "metro_station":9,
+        "office" :10,
+        "park":11,
+        "residential_area":12,
+        "train":13,
+        "tram":14
+
     }
 
     def __init__(self, root_dir, split, extension="txt"):
