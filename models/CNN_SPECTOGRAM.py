@@ -217,7 +217,7 @@ class Cnn(nn.Module):
         self,
         mel_bins=256,
         channels=[64, 128, 128, 128],
-        nb_classes=10,
+        nb_classes=15,
         dropout=0,
         spec_augment=None,
     ):
