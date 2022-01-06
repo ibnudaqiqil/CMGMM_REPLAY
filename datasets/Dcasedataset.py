@@ -3,6 +3,21 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
+"""
+Class to convert Stereo Audio to Mono
+"""
+
+
+class ToMono:
+    def __init__(self, channel_first=True):
+        self.channel_first = channel_first
+
+    def __call__(self, x):
+        assert len(x.shape) == 2, "Can only take two dimenshional Audio Tensors"
+        output = torch.mean(
+            x, dim=0) if self.channel_first else torch.mean(x, dim=1)
+        return output
+        
 #dataset for DCAE
 class DCaseDataset(Dataset):
   
@@ -99,12 +114,10 @@ class DCaseDataset(Dataset):
         # Load data
         filepath = self.root_dir + self.file_names[index]
         sound, sfreq = torchaudio.load(filepath)
-        print(sound.shape)
         assert sound.shape[0] == 1, "Expected mono channel"
         sound = torch.mean(sound, dim=0)
         assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
-        #print(sound)
-        #print(sfreq)
+    
         # Remove last samples if longer than expected
         if sound.shape[-1] >= 441000:
             sound = sound[:441000]
