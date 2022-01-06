@@ -3,7 +3,7 @@ import torch
 import tarfile
 import argparse
 from torch.utils.data import DataLoader
-from datasets.Dcasedataset import DCaseDataset, toMono
+from datasets.Dcasedataset import DCaseDataset, ToMono
 from models import get_net
 from models.CNN_SPECTOGRAM import LogMelSpectrogram
 from helper.training import TrainingManager
@@ -52,12 +52,12 @@ if __name__ == "__main__":
     train_dataset = DCaseDataset(
         current_dir + "/data/TUT-acoustic-scenes-2017-development/",
         split="train",
-        transform=toMono()
+        transform=ToMono()
     )
     test_dataset = DCaseDataset(
         current_dir + "/data/TUT-acoustic-scenes-2017-development/",
         split="val",
-        transform=toMono()
+        transform=ToMono()
     )
     loader_train = DataLoader(
         train_dataset,
