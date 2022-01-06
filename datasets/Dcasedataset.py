@@ -114,9 +114,9 @@ class DCaseDataset(Dataset):
         # Load data
         filepath = self.root_dir + self.file_names[index]
         sound, sfreq = torchaudio.load(filepath)
-        print( sound.shape)
-        sound = torch.mean(sound, dim=1)
-        print( sound.shape)
+        sound =sound[0]
+        sound = torch.mean(sound, dim=0)
+       
         assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
     
         # Remove last samples if longer than expected
