@@ -4,7 +4,7 @@ import tarfile
 import argparse
 from torch.utils.data import DataLoader
 from datasets.Dcasedataset import DCaseDataset
-from models.CNN_SPECTOGRAM import get_net
+from models import get_net
 from models.CNN_SPECTOGRAM import LogMelSpectrogram
 from helper.training import TrainingManager
 
