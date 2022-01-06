@@ -3,7 +3,7 @@ import torch
 import tarfile
 import argparse
 from torch.utils.data import DataLoader
-from datasets.Dcasedataset import DCaseDataset
+from datasets.Dcasedataset import DCaseDataset, ToMono
 from models import get_net
 from models.CNN_SPECTOGRAM import LogMelSpectrogram
 from helper.training import TrainingManager
