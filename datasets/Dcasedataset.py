@@ -71,9 +71,9 @@ class DCaseDataset(Dataset):
             self.labels.append(csvData.iloc[i, 1])
 
         # Device for each audio file
-        self.devices = {}
-        for i in range(0, len(metaData)):
-            self.devices[metaData.iloc[i, 0]] = metaData.iloc[i, 3]
+        #self.devices = {}
+        #for i in range(0, len(metaData)):
+        #    self.devices[metaData.iloc[i, 0]] = metaData.iloc[i, 3]
 
         # Transform class name to index
         self.labels = [self.name2labelind[name] for name in self.labels]
@@ -103,7 +103,7 @@ class DCaseDataset(Dataset):
                 sound,
                 self.labels[index],
                 self.file_names[index],
-                self.devices[self.file_names[index]],
+               # self.devices[self.file_names[index]],
             )
 
     def __len__(self):
