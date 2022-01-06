@@ -31,7 +31,7 @@ class DCaseDataset(Dataset):
         "tram": 9,
     }
 
-    def __init__(self, root_dir, split):
+    def __init__(self, root_dir, split, extension="txt"):
         """
 
         :param root_dir:
@@ -39,16 +39,17 @@ class DCaseDataset(Dataset):
         """
 
         # Open csv files
+        self.ext = extension
         self.split = split
         self.root_dir = root_dir
         if split == "train":
-            csv_path = root_dir + "/evaluation_setup/fold1_train.txt"
-            meta_path = root_dir + "/meta.csv"
+            csv_path = root_dir + "/evaluation_setup/fold1_train."+self.ext
+            meta_path = root_dir + "/meta."+self.ext
         elif split == "val":
-            csv_path = root_dir + "/evaluation_setup/fold1_evaluate.txt"
-            meta_path = root_dir + "/meta.csv"
+            csv_path = root_dir + "/evaluation_setup/fold1_evaluate."+self.ext
+            meta_path = root_dir + "/meta."+self.ext
         elif split == "test":
-            csv_path = root_dir + "/evaluation_setup/fold1_test.txt"
+            csv_path = root_dir + "/evaluation_setup/fold1_test."+self.ext
             meta_path = None
         else:
             raise ValueError("Split not implemented")
