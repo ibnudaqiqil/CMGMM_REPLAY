@@ -50,12 +50,12 @@ if __name__ == "__main__":
     # ---
     current_dir = os.path.dirname(os.path.abspath(__file__))
     train_dataset = DCaseDataset(
-        current_dir + "/data/TUT-acoustic-scenes-2017-development/",
+        current_dir + "/data/TAU-urban-acoustic-scenes-2020-mobile-development/",
         split="train",
        
     )
     test_dataset = DCaseDataset(
-        current_dir + "/data/TUT-acoustic-scenes-2017-development/",
+        current_dir + "/data/TAU-urban-acoustic-scenes-2020-mobile-development/",
         split="val",
         
     )

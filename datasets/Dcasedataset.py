@@ -3,61 +3,40 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
-"""
-Class to convert Stereo Audio to Mono
-"""
 
-
-class ToMono:
-    def __init__(self, channel_first=True):
-        self.channel_first = channel_first
-
-    def __call__(self, x):
-        assert len(x.shape) == 2, "Can only take two dimenshional Audio Tensors"
-        output = torch.mean(
-            x, dim=0) if self.channel_first else torch.mean(x, dim=1)
-        return output
-
-#dataset for DCAE
 class DCaseDataset(Dataset):
-  
+    """
+    Dataloader for DCase dataset
+    Structure of the class is taken from:
+    https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/audio_classifier_tutorial.ipynb
+    """
+
     labelind2name = {
-        0: "beach",
+        0: "airport",
         1: "bus",
-        2: "cafe/restaurant",
-        3: "car",
-        4: "city_center",
-        5: "forest_path",
-        6: "grocery_store",
-        7: "home",
-        8: "library",
-        9: "metro_station",
-        10: "office",
-        11: "park",
-        12: "residential_area",
-        13: "train",
-        14: "tram",
+        2: "metro",
+        3: "metro_station",
+        4: "park",
+        5: "public_square",
+        6: "shopping_mall",
+        7: "street_pedestrian",
+        8: "street_traffic",
+        9: "tram",
     }
     name2labelind = {
-        "beach": 0,
+        "airport": 0,
         "bus": 1,
-        "cafe/restaurant": 2,
-        "car": 3,
-        "city_center": 4,
-        "forest_path": 5,
-        "grocery_store": 6,
-        "home": 7,
-        "library": 8,
-        "metro_station":9,
-        "office" :10,
-        "park":11,
-        "residential_area":12,
-        "train":13,
-        "tram":14
-
+        "metro": 2,
+        "metro_station": 3,
+        "park": 4,
+        "public_square": 5,
+        "shopping_mall": 6,
+        "street_pedestrian": 7,
+        "street_traffic": 8,
+        "tram": 9,
     }
 
-    def __init__(self, root_dir, split, extension="txt"):
+    def __init__(self, root_dir, split):
         """
 
         :param root_dir:
@@ -65,23 +44,21 @@ class DCaseDataset(Dataset):
         """
 
         # Open csv files
-        self.ext = extension
         self.split = split
         self.root_dir = root_dir
         if split == "train":
-            csv_path = root_dir + "/evaluation_setup/fold1_train."+self.ext
-            meta_path = root_dir + "/meta."+self.ext
+            csv_path = root_dir + "/evaluation_setup/fold1_train.csv"
+            meta_path = root_dir + "/meta.csv"
         elif split == "val":
-            csv_path = root_dir + "/evaluation_setup/fold1_evaluate."+self.ext
-            meta_path = root_dir + "/meta."+self.ext
+            csv_path = root_dir + "/evaluation_setup/fold1_evaluate.csv"
+            meta_path = root_dir + "/meta.csv"
         elif split == "test":
-            csv_path = root_dir + "/evaluation_setup/fold1_test."+self.ext
+            csv_path = root_dir + "/evaluation_setup/fold1_test.csv"
             meta_path = None
         else:
             raise ValueError("Split not implemented")
         csvData = pd.read_csv(csv_path, sep="\t")
-        metaData = pd.read_csv(
-            meta_path, sep="\t") if meta_path is not None else None
+        metaData = pd.read_csv(meta_path, sep="\t") if meta_path is not None else None
 
         # In test mode, just get file list
         if split == "test":
@@ -97,9 +74,9 @@ class DCaseDataset(Dataset):
             self.labels.append(csvData.iloc[i, 1])
 
         # Device for each audio file
-        #self.devices = {}
-        #for i in range(0, len(metaData)):
-        #    self.devices[metaData.iloc[i, 0]] = metaData.iloc[i, 3]
+        self.devices = {}
+        for i in range(0, len(metaData)):
+            self.devices[metaData.iloc[i, 0]] = metaData.iloc[i, 3]
 
         # Transform class name to index
         self.labels = [self.name2labelind[name] for name in self.labels]
@@ -113,12 +90,11 @@ class DCaseDataset(Dataset):
 
         # Load data
         filepath = self.root_dir + self.file_names[index]
-        sound, sfreq = torchaudio.load(filepath)
-        sound =sound[0]
+        sound, sfreq = torchaudio.load(filepath, normalization=True)
+        assert sound.shape[0] == 1, "Expected mono channel"
         sound = torch.mean(sound, dim=0)
-       
         assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
-    
+
         # Remove last samples if longer than expected
         if sound.shape[-1] >= 441000:
             sound = sound[:441000]
@@ -130,7 +106,7 @@ class DCaseDataset(Dataset):
                 sound,
                 self.labels[index],
                 self.file_names[index],
-               # self.devices[self.file_names[index]],
+                self.devices[self.file_names[index]],
             )
 
     def __len__(self):
