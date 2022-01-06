@@ -332,7 +332,7 @@ class Cnn6_60k(Cnn):
         """
         super(Cnn6_60k, self).__init__(
             dropout=dropout,
-            nb_classes=10,
+            nb_classes=15,
             channels=[64, 128, 128, 128],
             spec_augment=spec_aug,
         )

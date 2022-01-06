@@ -92,7 +92,7 @@ class TrainingManager:
 
         # Monitoring
         self.writer = SummaryWriter(
-            path_to_ckpt + "/tensorboard/",
+            path_to_ckpt + "/runs/",
             purge_step=self.current_epoch + 1,
         )
 
