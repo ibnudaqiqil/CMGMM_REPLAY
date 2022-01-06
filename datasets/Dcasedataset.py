@@ -42,13 +42,13 @@ class DCaseDataset(Dataset):
         self.split = split
         self.root_dir = root_dir
         if split == "train":
-            csv_path = root_dir + "/evaluation_setup/fold1_train.csv"
+            csv_path = root_dir + "/evaluation_setup/fold1_train.txt"
             meta_path = root_dir + "/meta.csv"
         elif split == "val":
-            csv_path = root_dir + "/evaluation_setup/fold1_evaluate.csv"
+            csv_path = root_dir + "/evaluation_setup/fold1_evaluate.txt"
             meta_path = root_dir + "/meta.csv"
         elif split == "test":
-            csv_path = root_dir + "/evaluation_setup/fold1_test.csv"
+            csv_path = root_dir + "/evaluation_setup/fold1_test.txt"
             meta_path = None
         else:
             raise ValueError("Split not implemented")
