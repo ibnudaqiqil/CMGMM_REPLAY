@@ -102,8 +102,8 @@ class DCaseDataset(Dataset):
         #assert sound.shape[0] == 1, "Expected mono channel"
         sound = torch.mean(sound, dim=0)
        # assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
-        print(sound)
-        print(sfreq)
+        #print(sound)
+        #print(sfreq)
         # Remove last samples if longer than expected
         if sound.shape[-1] >= 441000:
             sound = sound[:441000]
