@@ -99,9 +99,9 @@ class DCaseDataset(Dataset):
         # Load data
         filepath = self.root_dir + self.file_names[index]
         sound, sfreq = torchaudio.load(filepath)
-        #assert sound.shape[0] == 1, "Expected mono channel"
+        assert sound.shape[0] == 1, "Expected mono channel"
         sound = torch.mean(sound, dim=0)
-       # assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
+        assert sfreq == 44100, "Expected sampling rate of 44.1 kHz"
         #print(sound)
         #print(sfreq)
         # Remove last samples if longer than expected
