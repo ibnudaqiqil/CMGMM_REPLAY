@@ -41,7 +41,7 @@ class UrbanSoundDataset(Dataset):
         sound = torchaudio.load(path)
         #load returns a tensor with the sound data and the sampling frequency (44.1kHz for UrbanSound8K)
        # soundData = self.mixer(sound[0])
-        soundData = torch.mean(sound, dim=0).unsqueeze(0)
+        soundData = sound.mean(0).unsqueeze(0)
         #downsample the audio to ~8kHz
         # tempData accounts for audio clips that are too short
         tempData = torch.zeros([160000, 1])
