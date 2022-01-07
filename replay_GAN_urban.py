@@ -87,6 +87,7 @@ def train(model, train_loader, optimizer, epoch):
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
         data = data.to(device)
+        print(data.shape)
         target = target.to(device)
         data = data.requires_grad_()  # set requires_grad to True for training
         output = model(data)

@@ -32,14 +32,14 @@ class UrbanSoundDataset(Dataset):
         signal, sample_rate = torchaudio.load(
             str(audio_sample_path)
         )  # (wave_form, sample_rate)
-        print(f"sognal shape before resampling = {signal.size()}")
+        #print(f"sognal shape before resampling = {signal.size()}")
         signal = self._resample_if_necessary(signal, sample_rate)
 
-        print(f"sognal shape before mixing = {signal.size()}")
+        #print(f"sognal shape before mixing = {signal.size()}")
         signal = self._mix_down_if_necessary(signal)
 
-        print(f"sognal shape before transforming = {signal.size()}")
-        signal = self.transforms(signal)
+        #print(f"sognal shape before transforming = {signal.size()}")
+        #signal = self.transforms(signal)
 
         return signal, label
 
