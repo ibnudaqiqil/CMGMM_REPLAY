@@ -38,20 +38,8 @@ class UrbanSoundDataset(Dataset):
         #print(f"sognal shape before mixing = {signal.size()}")
         signal = self._mix_down_if_necessary(signal)
 
-        #print(f"sognal shape before transforming = {signal.size()}")
-        #signal = self.transforms(signal)
-        # tempData accounts for audio clips that are too short
-        tempData = torch.zeros([160000, 1])
-        if signal.numel() < 160000:
-            tempData[:signal.numel()] = signal[:]
-        else:
-            tempData[:] = signal[:160000]
-
-        signal = tempData
-        soundFormatted = torch.zeros([32000, 1])
-        # take every fifth sample of soundData
-        soundFormatted[:32000] = signal[::5]
-        soundFormatted = soundFormatted.permute(1, 0)
+        print(f"sognal shape before transforming = {signal.size()}")
+        signal = self.transforms(signal)
 
         return signal, label
 
