@@ -31,7 +31,7 @@ class UrbanSoundDataset(Dataset):
 
         self.file_path = file_path
         # UrbanSound8K uses two channels, this will convert them to one
-        self.mixer = torchaudio.transforms.DownmixMono()
+        #self.mixer = torchaudio.transforms.DownmixMono()
         self.folderList = folderList
 
     def __getitem__(self, index):
@@ -40,7 +40,8 @@ class UrbanSoundDataset(Dataset):
             str(self.folders[index]) + "/" + self.file_names[index]
         sound = torchaudio.load(path, out=None, normalization=True)
         #load returns a tensor with the sound data and the sampling frequency (44.1kHz for UrbanSound8K)
-        soundData = self.mixer(sound[0])
+       # soundData = self.mixer(sound[0])
+        soundData = torch.mean(sound, dim=0, keepdim=True)
         #downsample the audio to ~8kHz
         # tempData accounts for audio clips that are too short
         tempData = torch.zeros([160000, 1])
