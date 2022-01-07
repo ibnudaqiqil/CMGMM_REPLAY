@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
     # instantiating our dataset we handled before
 
-    mel_spectrogram = transforms.MelSpectrogram(
+    mel_spectrogram = torchaudio.transforms.MelSpectrogram(
         sample_rate=SAMPLE_RATE,
         n_fft=1024,
         hop_length=512,
