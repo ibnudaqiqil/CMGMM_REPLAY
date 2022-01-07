@@ -1,68 +1,116 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.utils.data import Dataset
 import torchaudio
+from torch.utils.data import Dataset
+import torchaudio.transforms as tf
+import torch.nn.functional as F
 import pandas as pd
-import numpy as np
-from pathlib import Path
+import os
+
 
 class UrbanSoundDataset(Dataset):
-    """
-    This Dataset now returns Mel Spectograms of the sound with the same sample_rate and 1 channel, instead of Waveforms
-    """
+   # annotatio files -> path to csv, audio_dir -> path to dir containing the audio set
+   def __init__(self,
+                annotations_file,
+                audio_dir,
+                transformation,
+                target_sample_rate,
+                num_samples,
+                device):
+      self.annotations = pd.read_csv(annotations_file)
+      self.audio_dir = audio_dir
+      self.transformation = transformation.to(device)
+      self.target_sample_rate = target_sample_rate
+      self.num_samples = num_samples
+      self.device = device
 
-    def __init__(
-        self, annotations_file: Path, audio_dir: Path, transforms, target_sample_rate
-    ):
-        super().__init__()
-        self.annotations = pd.read_csv(str(annotations_file))
-        self.audio_dir = audio_dir
-        self.transforms = transforms
-        self.target_sample_rate = target_sample_rate
+   def __len__(self):
+      return len(self.annotations)
 
-    def __len__(self):
-        return len(self.annotations)
+   def __getitem__(self, index):
+      #deep learning models requires fixed datasets in shape etc.
+      #like mel spectograms. their shape is fixed.
+      audio_sample_path = self._get_audio_sample_path(index)
+      label = self._audio_sample_label(index)
+      signal, sr = torchaudio.load(audio_sample_path)
+      signal = signal.to(self.device)
+      signal = self._resample_if_necessary(signal, sr)
 
-    def __getitem__(self, index):
-        audio_sample_path = self._get_audio_sample_path(index)
-        label = self._get_audio_sample_label(index)
-        signal, sample_rate = torchaudio.load(
-            str(audio_sample_path)
-        )  # (wave_form, sample_rate)
-        #print(f"sognal shape before resampling = {signal.size()}")
-        signal = self._resample_if_necessary(signal, sample_rate)
+      # signal -> (num_channels, samples) -> (2, 16000) -> (1, 16000) [by mixing down]
+      signal = self._mix_down_if_necessary(signal)
 
-        #print(f"sognal shape before mixing = {signal.size()}")
-        signal = self._mix_down_if_necessary(signal)
+      signal = self._cut_if_necessary(signal)
+      signal = self._right_pad_if_necessary(signal)
 
-        print(f"sognal shape before transforming = {signal.size()}")
-        signal = self.transforms(signal)
+      signal = self.transformation(signal)
+      return signal, label
 
-        return signal, label
+   def _get_audio_sample_path(self, index):
+      fold = f"fold{self.annotations.fold[index]}"
+      file = self.annotations.slice_file_name[index]
+      path = os.path.join(self.audio_dir, fold, file)
+      return path
 
-    def _get_audio_sample_path(self, index):
-        folder = f"fold{self.annotations.iloc[index, 5]}"
-        path = self.audio_dir + "/" + folder + \
-            "/" + self.annotations.iloc[index, 0]
-        return path
+   def _audio_sample_label(self, index):
+      return self.annotations.classID[index]
 
-    def _get_audio_sample_label(self, index):
-        return self.annotations.iloc[index, 6]
+   def _resample_if_necessary(self, signal, sr):
 
-    def _resample_if_necessary(self, signal, sample_rate):
-        """set the sample rate same for every datapoint in the dataset"""
-        if sample_rate != self.target_sample_rate:
-            resampler = torchaudio.transforms.Resample(
-                sample_rate, self.target_sample_rate
-            )
-            signal = resampler(signal)
-        return signal
+      if(sr != self.target_sample_rate):
+         resample = tf.Resample(sr, self.target_sample_rate).to(self.device)
+         signal = resample(signal)
 
-    def _mix_down_if_necessary(self, signal):
-        """if we have multiple channels than we have to average them on the channels dimentsion"""
-        if signal.shape[0] > 1:
-            signal = torch.mean(signal, dim=0, keepdim=True)
-        return signal
+      return signal
+
+   def _mix_down_if_necessary(self, signal):
+      if(signal.shape[0] > 1):  # more than one channel
+         signal = torch.mean(signal, dim=0, keepdim=True)  # mixing down
+      return signal
+
+   def _cut_if_necessary(self, signal):
+      if(signal.shape[1] > self.num_samples):
+         signal = signal[:, :self.num_samples]
+      return signal
+
+   def _right_pad_if_necessary(self, signal):
+      if(signal.shape[1] < self.num_samples):
+         pad_num = self.num_samples - signal.shape[1]
+         signal = F.pad(signal, (0, pad_num))
+      return signal
+
+
+if __name__ == '__main__':
+
+   ANNOTATIONS_FILE = './UrbanSound8K/metadata/UrbanSound8K.csv'
+   AUDIO_DIR = './UrbanSound8K/audio'
+   SAMPLE_RATE = 22050
+   # we are getting one second from the expected audio (since sr = 22050 as well)
+   NUM_SAMPLES = 22050
+
+   if torch.cuda.is_available():
+      device = 'cuda'
+   else:
+      device = 'cpu'
+
+   print(f"Using the device {device}")
+
+   mel_spectrogram = tf.MelSpectrogram(
+       sample_rate=SAMPLE_RATE,
+       n_fft=1024,
+       hop_length=512,
+       n_mels=64
+   )
+   # hop_length is usually n_fft/2
+   # ms = mell_spectogram(signal)
+
+   usd = UrbanSoundDataset(ANNOTATIONS_FILE,
+                           AUDIO_DIR,
+                           mel_spectrogram,
+                           SAMPLE_RATE,
+                           NUM_SAMPLES,
+                           device)
+
+   print(f"There are {len(usd)} samples in the dataset.")
+
+   signal, label = usd[1]
+
+   print(f"First signal is {signal} with label {label}.")
