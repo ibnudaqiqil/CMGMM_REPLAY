@@ -14,9 +14,16 @@ print(device)
 
 csv_path = './data/UrbanSound8K/metadata/UrbanSound8K.csv'
 file_path = './data/UrbanSound8K/audio/'
+SAMPLE_RATE = 16000
+mel_spectogram = torchaudio.transforms.MelSpectrogram(
+    sample_rate=SAMPLE_RATE, n_fft=1024, hop_length=512, n_mels=64
+)
 
-train_set = UrbanSoundDataset(csv_path, file_path, range(1, 10))
-test_set = UrbanSoundDataset(csv_path, file_path, [10])
+
+train_set = UrbanSoundDataset(csv_path, file_path,       transforms=mel_spectogram,
+                              target_sample_rate=SAMPLE_RATE,)
+test_set = UrbanSoundDataset(csv_path, file_path,        transforms=mel_spectogram,
+                             target_sample_rate=SAMPLE_RATE,)
 print("Train set size: " + str(len(train_set)))
 print("Test set size: " + str(len(test_set)))
 

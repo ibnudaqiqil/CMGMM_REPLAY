@@ -7,55 +7,61 @@ from torch.utils.data import Dataset
 import torchaudio
 import pandas as pd
 import numpy as np
-
+from pathlib import Path
 
 class UrbanSoundDataset(Dataset):
-    #rapper for the UrbanSound8K dataset
-    # Argument List
-    #  path to the UrbanSound8K csv file
-    #  path to the UrbanSound8K audio files
-    #  list of folders to use in the dataset
+    """
+    This Dataset now returns Mel Spectograms of the sound with the same sample_rate and 1 channel, instead of Waveforms
+    """
 
-    def __init__(self, csv_path, file_path, folderList):
-        csvData = pd.read_csv(csv_path)
-        #initialize lists to hold file names, labels, and folder numbers
-        self.file_names = []
-        self.labels = []
-        self.folders = []
-        #loop through the csv entries and only add entries from folders in the folder list
-        for i in range(0, len(csvData)):
-            if csvData.iloc[i, 5] in folderList:
-                self.file_names.append(csvData.iloc[i, 0])
-                self.labels.append(csvData.iloc[i, 6])
-                self.folders.append(csvData.iloc[i, 5])
-
-        self.file_path = file_path
-        # UrbanSound8K uses two channels, this will convert them to one
-        #self.mixer = torchaudio.transforms.DownmixMono()
-        self.folderList = folderList
-
-    def __getitem__(self, index):
-        #format the file path and load the file
-        path = self.file_path + "fold" + \
-            str(self.folders[index]) + "/" + self.file_names[index]
-        sound,_ = torchaudio.load(path)
-        #load returns a tensor with the sound data and the sampling frequency (44.1kHz for UrbanSound8K)
-       # soundData = self.mixer(sound[0])
-        soundData = sound.mean(0).unsqueeze(0)
-        #downsample the audio to ~8kHz
-        # tempData accounts for audio clips that are too short
-        tempData = torch.zeros([160000, 1])
-        if soundData.numel() < 160000:
-            tempData[:soundData.numel()] = soundData[:]
-        else:
-            tempData[:] = soundData[:160000]
-
-        soundData = tempData
-        soundFormatted = torch.zeros([32000, 1])
-        # take every fifth sample of soundData
-        soundFormatted[:32000] = soundData[::5]
-        soundFormatted = soundFormatted.permute(1, 0)
-        return soundFormatted, self.labels[index]
+    def __init__(
+        self, annotations_file: Path, audio_dir: Path, transforms, target_sample_rate
+    ):
+        super().__init__()
+        self.annotations = pd.read_csv(str(annotations_file))
+        self.audio_dir = audio_dir
+        self.transforms = transforms
+        self.target_sample_rate = target_sample_rate
 
     def __len__(self):
-        return len(self.file_names)
+        return len(self.annotations)
+
+    def __getitem__(self, index):
+        audio_sample_path = self._get_audio_sample_path(index)
+        label = self._get_audio_sample_label(index)
+        signal, sample_rate = torchaudio.load(
+            str(audio_sample_path)
+        )  # (wave_form, sample_rate)
+        print(f"sognal shape before resampling = {signal.size()}")
+        signal = self._resample_if_necessary(signal, sample_rate)
+
+        print(f"sognal shape before mixing = {signal.size()}")
+        signal = self._mix_down_if_necessary(signal)
+
+        print(f"sognal shape before transforming = {signal.size()}")
+        signal = self.transforms(signal)
+
+        return signal, label
+
+    def _get_audio_sample_path(self, index):
+        folder = f"fold{self.annotations.iloc[index, 5]}"
+        path = self.audio_dir / folder / self.annotations.iloc[index, 0]
+        return path
+
+    def _get_audio_sample_label(self, index):
+        return self.annotations.iloc[index, 6]
+
+    def _resample_if_necessary(self, signal, sample_rate):
+        """set the sample rate same for every datapoint in the dataset"""
+        if sample_rate != self.target_sample_rate:
+            resampler = torchaudio.transforms.Resample(
+                sample_rate, self.target_sample_rate
+            )
+            signal = resampler(signal)
+        return signal
+
+    def _mix_down_if_necessary(self, signal):
+        """if we have multiple channels than we have to average them on the channels dimentsion"""
+        if signal.shape[0] > 1:
+            signal = torch.mean(signal, dim=0, keepdim=True)
+        return signal
