@@ -38,7 +38,7 @@ class UrbanSoundDataset(Dataset):
         #format the file path and load the file
         path = self.file_path + "fold" + \
             str(self.folders[index]) + "/" + self.file_names[index]
-        sound = torchaudio.load(path)
+        sound,_ = torchaudio.load(path)
         #load returns a tensor with the sound data and the sampling frequency (44.1kHz for UrbanSound8K)
        # soundData = self.mixer(sound[0])
         soundData = sound.mean(0).unsqueeze(0)
