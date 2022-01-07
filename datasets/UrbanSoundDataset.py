@@ -43,7 +43,7 @@ class UrbanSoundDataset(Dataset):
         # tempData accounts for audio clips that are too short
         tempData = torch.zeros([160000, 1])
         if signal.numel() < 160000:
-            tempData[:signal.numel()] = soundData[:]
+            tempData[:signal.numel()] = signal[:]
         else:
             tempData[:] = signal[:160000]
 
