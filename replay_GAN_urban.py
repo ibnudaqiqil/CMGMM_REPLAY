@@ -75,7 +75,7 @@ optimizer = optim.Adam(model.parameters(), lr=0.01, weight_decay=0.0001)
 scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
 
 
-def train(model, epoch):
+def train(model, train_loader, optimizer, epoch):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
         optimizer.zero_grad()
@@ -95,7 +95,7 @@ def train(model, epoch):
                 100. * batch_idx / len(train_loader), loss))
 
 
-def test(model, epoch):
+def test(model, test_loader,  optimizer, epoch):
     model.eval()
     correct = 0
     for data, target in test_loader:
@@ -116,5 +116,5 @@ for epoch in range(1, 50):
     if epoch == 31:
         print("First round of training complete. Setting learn rate to 0.001.")
     scheduler.step()
-    train(model, epoch)
-    test(model, epoch)
+    train(model, train_loader, optimizer,epoch)
+    test(model, test_loader, optimizer, epoch)
