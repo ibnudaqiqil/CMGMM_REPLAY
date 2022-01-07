@@ -38,8 +38,8 @@ class UrbanSoundDataset(Dataset):
         #print(f"sognal shape before mixing = {signal.size()}")
         signal = self._mix_down_if_necessary(signal)
 
-        #print(f"sognal shape before transforming = {signal.size()}")
-        #signal = self.transforms(signal)
+        print(f"sognal shape before transforming = {signal.size()}")
+        signal = self.transforms(signal)
 
         return signal, label
 
