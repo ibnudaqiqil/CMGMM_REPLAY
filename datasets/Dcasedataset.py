@@ -20,11 +20,6 @@ class ToMono:
 
         
 class DCaseDataset(Dataset):
-    """
-    Dataloader for DCase dataset
-    Structure of the class is taken from:
-    https://colab.research.google.com/github/pytorch/tutorials/blob/gh-pages/_downloads/audio_classifier_tutorial.ipynb
-    """
 
     labelind2name = {
         0: "airport",
