@@ -50,8 +50,7 @@ for i in range(tasks_num):
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 from models.MNIST import SolverCNN
 
-generator = Generator().to(device)
-discriminator = Discriminator().to(device)
+
 
 classifier = SolverCNN(L=10).to(device)
 #train for every task
