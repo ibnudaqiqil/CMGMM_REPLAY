@@ -101,5 +101,5 @@ class MNIST_IncrementalDataset(torchvision.datasets.MNIST):
             
             self.TrainData.append(_data)
             self.TrainLabels.append(label[i].cpu())
-        self.TrainData = torch.FloatTensor(
+        self.TrainData = torch.as_tensor(
             self.TrainData)
