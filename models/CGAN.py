@@ -203,4 +203,4 @@ def sample_image(generator,n_row, gen_label, latent_dim):
     gen_imgs = generator(z, y)
         #save_image(gen_imgs.data, img_save_path + '/%d.png' % lbl, nrow=n_row, normalize=True)
    # gen_imgs = generator(z, y)
-    return gen_imgs
+    return gen_imgs,y

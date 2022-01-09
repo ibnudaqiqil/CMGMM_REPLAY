@@ -55,13 +55,15 @@ previous_generator = None
 for task_id in range(tasks_num):
     ratio = 1 / (task_id+1)  
     if task_id > 0:
-        previous_generator = 1#generator
+        previous_generator = generator
         previous_classifier = classifier
 
-        #lib.model_grad_switch(previous_generator, False)
-        #lib.model_grad_switch(previous_classifier, False)
-    print(TrainDataSet[task_id].data[0].shape)
+        lib.model_grad_switch(previous_generator, False)
+        lib.model_grad_switch(previous_classifier, False)
+    
     if(previous_generator):
+        psudodataset,lbl = sample_image(previous_generator, 6000, list(range(0, (task_id+(task_id-1)))), 100)
+        TrainDataSet[task_id].appendData(psudodataset, lbl)
         TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
                                                         batch_size=batch_size,
                                                         shuffle=True)
