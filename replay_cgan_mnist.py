@@ -60,7 +60,7 @@ for task_id in range(tasks_num):
 
         #lib.model_grad_switch(previous_generator, False)
         #lib.model_grad_switch(previous_classifier, False)
-    print(TrainDataSet[task_id].shape)
+    print(TrainDataSet[task_id])
     if(previous_generator):
         TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
                                                         batch_size=batch_size,
