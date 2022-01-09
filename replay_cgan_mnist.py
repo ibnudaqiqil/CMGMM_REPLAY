@@ -1,4 +1,4 @@
-from models.CGAN import Generator, Discriminator, train_replayer, weights_init_normal
+from models.CGAN import Generator, Discriminator, train_replayer, weights_init_normal, sample_image
 import torch
 import torchvision
 import numpy as np
@@ -65,3 +65,4 @@ for task_id in range(tasks_num):
 
     # train the generator and classifier
     generator,discriminator = train_replayer(TrainDataLoaders[task_id], (task_id+1) * 2, writer)
+    img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
