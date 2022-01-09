@@ -75,7 +75,7 @@ class MNIST_IncrementalDataset(torchvision.datasets.MNIST):
             test_labels = []
             for i in range(len(self.test_data)):
                 if self.test_labels[i] in classes:
-                    _data = transform(self.test_data[i]) if transform is not None else self.test_data[i]
+                    _data = transform(self.test_data[i].numpy()) if transform is not None else self.test_data[i]
                     # test_data.append(self.test_data[i].type(dtype=torch.float32))
                     test_data.append(_data)
                     test_labels.append(self.test_labels[i])
