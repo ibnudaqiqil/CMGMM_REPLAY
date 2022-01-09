@@ -63,6 +63,7 @@ for task_id in range(tasks_num):
     
     if(previous_generator):
         psudodataset,lbl = sample_image(previous_generator, 6000, list(range(0, (task_id+(task_id-1)))), 100)
+        print("appending data from 0 to ", (task_id+(task_id-1)))
         TrainDataSet[task_id].appendData(psudodataset, lbl)
         TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
                                                         batch_size=batch_size,
@@ -81,6 +82,6 @@ for task_id in range(tasks_num):
     print("task",task_id)
     generator,discriminator = train_replayer(TrainDataLoaders, (task_id+1) * 2, writer)
     img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
-    print(img.shape)
+   
     #save_image(img.data, 'store/%d.png' % task_id, nrow=10, normalize=True)
             
