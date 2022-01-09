@@ -18,7 +18,7 @@ batch_size = num_noise = 64
 
 transform = torchvision.transforms.Compose([
     torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize(mean=[0.5], std=[0.5])
+    #torchvision.transforms.Normalize(mean=[0.5], std=[0.5])
 ])
 
 TrainDataSet = []
@@ -60,7 +60,7 @@ for task_id in range(tasks_num):
 
         #lib.model_grad_switch(previous_generator, False)
         #lib.model_grad_switch(previous_classifier, False)
-    print(TrainDataSet[task_id])
+    print(TrainDataSet[task_id].data[0].shape)
     if(previous_generator):
         TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
                                                         batch_size=batch_size,
@@ -77,7 +77,8 @@ for task_id in range(tasks_num):
                                                         shuffle=False)
     # train the generator and classifier
     print("task",task_id)
-    #generator,discriminator = train_replayer(TrainDataLoaders, (task_id+1) * 2, writer)
-    #img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
+    generator,discriminator = train_replayer(TrainDataLoaders, (task_id+1) * 2, writer)
+    img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
+    print(img.shape)
     #save_image(img.data, 'store/%d.png' % task_id, nrow=10, normalize=True)
             
