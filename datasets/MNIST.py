@@ -98,6 +98,7 @@ class MNIST_IncrementalDataset(torchvision.datasets.MNIST):
     def appendData(self,psudodata,label):
         for i in range(len(psudodata)):
             _data = psudodata[i].cpu().detach().numpy()
-            print(_data.shape)
+            
             self.TrainData.append(_data)
             self.TrainLabels.append(label[i].cpu())
+        self.TrainData = torch.from_numpy(self.TrainData).type(dtype=torch.float32)
