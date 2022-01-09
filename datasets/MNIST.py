@@ -101,7 +101,7 @@ class MNIST_IncrementalDataset(torchvision.datasets.MNIST):
         print(self.TrainData[0].shape)
         
         for i in range(len(psudodata)):
-            _data = self.transform(psudodata[i].cpu().numpy()) if self.transform is not None else psudodata[i]
+            _data = psudodata[i]
             print(_data.shape)
             self.TrainData.append(_data)
             self.TrainLabels.append(label[i].cpu())
