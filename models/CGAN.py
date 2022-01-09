@@ -25,53 +25,61 @@ def weights_init_normal(m):
 
 
 class Generator(nn.Module):
-    # initializers
-    def __init__(self,H=28,W=28):
+    def __init__(self, n_classes, img_shape, latent_dim):
         super(Generator, self).__init__()
-        self.fc1_1 = nn.Linear(100, 256)
-        self.fc1_1_bn = nn.BatchNorm1d(256)
-        self.fc1_2 = nn.Linear(10, 256)
-        self.fc1_2_bn = nn.BatchNorm1d(256)
-        self.fc2 = nn.Linear(512, 512)
-        self.fc2_bn = nn.BatchNorm1d(512)
-        self.fc3 = nn.Linear(512, 1024)
-        self.fc3_bn = nn.BatchNorm1d(1024)
-        self.fc4 = nn.Linear(1024, H*W)
 
-    # forward method
+        self.label_emb = nn.Embedding(n_classes, n_classes)
+        self.img_shape = img_shape
+        def block(in_feat, out_feat, normalize=True):
+            layers = [nn.Linear(in_feat, out_feat)]
+            if normalize:
+                layers.append(nn.BatchNorm1d(out_feat, 0.8))
+            layers.append(nn.LeakyReLU(0.2, inplace=True))
+            return layers
 
-    def forward(self, input, label):
-        x = F.relu(self.fc1_1_bn(self.fc1_1(input)))
-        y = F.relu(self.fc1_2_bn(self.fc1_2(label)))
-        x = torch.cat([x, y], 1)
-        x = F.relu(self.fc2_bn(self.fc2(x)))
-        x = F.relu(self.fc3_bn(self.fc3(x)))
-        x = F.tanh(self.fc4(x))
-        return x
+        self.model = nn.Sequential(
+            *block(latent_dim + n_classes, 128, normalize=False),
+            *block(128, 256),
+            *block(256, 512),
+            *block(512, 1024),
+            nn.Linear(1024, int(np.prod(img_shape))),
+            nn.Tanh()
+        )
+
+    def forward(self, noise, labels):
+        # Concatenate label embedding and image to produce input
+        gen_input = torch.cat((self.label_emb(labels), noise), -1)
+        img = self.model(gen_input)
+        img = img.view(img.size(0), *self.img_shape)
+        return img
 
 
 class Discriminator(nn.Module):
-    # initializers
-    def __init__(self, H=28, W=28):
+    def __init__(self, n_classes, img_shape):
         super(Discriminator, self).__init__()
-        self.fc1_1 = nn.Linear(H*W, 1024)
-        self.fc1_2 = nn.Linear(10, 1024)
-        self.fc2 = nn.Linear(2048, 512)
-        self.fc2_bn = nn.BatchNorm1d(512)
-        self.fc3 = nn.Linear(512, 256)
-        self.fc3_bn = nn.BatchNorm1d(256)
-        self.fc4 = nn.Linear(256, 1)
 
-    # forward method
+        self.label_embedding = nn.Embedding(n_classes, n_classes)
 
-    def forward(self, input, label):
-        x = F.leaky_relu(self.fc1_1(input.view(input.size(0), -1)), 0.2)
-        y = F.leaky_relu(self.fc1_2(label), 0.2)
-        x = torch.cat([x, y], 1)
-        x = F.leaky_relu(self.fc2_bn(self.fc2(x)), 0.2)
-        x = F.leaky_relu(self.fc3_bn(self.fc3(x)), 0.2)
-        x = F.sigmoid(self.fc4(x))
-        return x
+        self.model = nn.Sequential(
+            nn.Linear(n_classes + int(np.prod(img_shape)), 512),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(512, 512),
+            nn.Dropout(0.4),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(512, 512),
+            nn.Dropout(0.4),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(512, 1),
+        )
+
+    def forward(self, img, labels):
+        # Concatenate label embedding and image to produce input
+        d_in = torch.cat((img.view(img.size(0), -1),
+                          self.label_embedding(labels)), -1)
+        validity = self.model(d_in)
+        return validity
+
+
 
 
 def train_replayer(dataloader, n_classes,writer):
@@ -83,7 +91,7 @@ def train_replayer(dataloader, n_classes,writer):
     sample_interval= 10
     latent_dim = 100    
     # Loss function
-    adversarial_loss = torch.nn.BCELoss()
+    adversarial_loss = torch.nn.MSELoss() #torch.nn.BCELoss()
 
     # Initialize Generator and discriminator
     generator = Generator()
