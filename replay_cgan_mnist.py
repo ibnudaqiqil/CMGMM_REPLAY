@@ -21,32 +21,28 @@ transform = torchvision.transforms.Compose([
     torchvision.transforms.Normalize(mean=[0.5], std=[0.5])
 ])
 
-TrainDataLoaders = []
-TestDataLoaders = []
+TrainDataSet = []
+TestDataSet = []
+
 # tasks to use
 task_classes_arr = [(0, 1), (2, 3), (4, 5), (6, 7), (8, 9)]
 tasks_num = len(task_classes_arr)  # 5
 
 for i in range(tasks_num):
     # MNIST dataset
-    TrainDataSet = MNIST_IncrementalDataset(source='./data/',
+    _TrainDataSet = MNIST_IncrementalDataset(source='./data/',
                                             train=True,
                                             transform=transform,
                                             download=True,
                                             classes=range(i * 2, (i+1) * 2))
 
-    TestDataSet = MNIST_IncrementalDataset(source='./data/',
+    _TestDataSet = MNIST_IncrementalDataset(source='./data/',
                                            train=False,
                                            transform=transform,
                                            download=True,
-                                           classes=range(i * 2, (i+1) * 2))
-
-    TrainDataLoaders.append(torch.utils.data.DataLoader(TrainDataSet,
-                                                        batch_size=batch_size,
-                                                        shuffle=True))
-    TestDataLoaders.append(torch.utils.data.DataLoader(TestDataSet,
-                                                       batch_size=batch_size,
-                                                       shuffle=False))
+                                           classes=range(0, (i+1) * 2))
+    TrainDataSet.append(_TrainDataSet)
+    TestDataSet.append(_TestDataSet)
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 from models.MNIST import SolverCNN
@@ -54,19 +50,34 @@ from models.MNIST import SolverCNN
 
 
 classifier = SolverCNN(L=10).to(device)
+previous_generator = None
 #train for every task
 for task_id in range(tasks_num):
     ratio = 1 / (task_id+1)  
     if task_id > 0:
-        previous_generator = generator
+        previous_generator = 1#generator
         previous_classifier = classifier
 
-        lib.model_grad_switch(previous_generator, False)
-        lib.model_grad_switch(previous_classifier, False)
-
+        #lib.model_grad_switch(previous_generator, False)
+        #lib.model_grad_switch(previous_classifier, False)
+    print(TrainDataSet[task_id].shape)
+    if(previous_generator):
+        TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
+                                                        batch_size=batch_size,
+                                                        shuffle=True)
+        TestDataLoaders = torch.utils.data.DataLoader(TestDataSet[task_id],
+                                                    batch_size=batch_size,
+                                                    shuffle=False)
+    else:
+        TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
+                                                                batch_size=batch_size,
+                                                                shuffle=True)
+        TestDataLoaders = torch.utils.data.DataLoader(TestDataSet[task_id],
+                                                        batch_size=batch_size,
+                                                        shuffle=False)
     # train the generator and classifier
     print("task",task_id)
-    generator,discriminator = train_replayer(TrainDataLoaders[task_id], (task_id+1) * 2, writer)
-    img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
-    save_image(img.data, 'store/%d.png' % task_id, nrow=10, normalize=True)
+    #generator,discriminator = train_replayer(TrainDataLoaders, (task_id+1) * 2, writer)
+    #img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
+    #save_image(img.data, 'store/%d.png' % task_id, nrow=10, normalize=True)
             
