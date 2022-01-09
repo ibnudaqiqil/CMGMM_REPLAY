@@ -89,13 +89,14 @@ def train_replayer(dataloader, n_classes,writer):
     n_epochs =100
     batch_size = 64
     sample_interval= 10
-    latent_dim = 100    
+    latent_dim = 100
+    img_shape=28
     # Loss function
     adversarial_loss = torch.nn.MSELoss() #torch.nn.BCELoss()
 
     # Initialize Generator and discriminator
-    generator = Generator()
-    discriminator = Discriminator()
+    generator = Generator(n_classes, img_shape, latent_dim)
+    discriminator = Discriminator(n_classes, img_shape)
 
     if torch.cuda.is_available():
         generator.cuda()
