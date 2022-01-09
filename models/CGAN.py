@@ -181,11 +181,6 @@ def train_replayer(dataloader, n_classes,writer):
             d_loss.backward()
             optimizer_D.step()
 
-            print(
-                "[Epoch %d/%d] [Batch %d/%d] [D loss: %f] [G loss: %f]"
-                % (epoch, n_epochs, i, len(dataloader), d_loss.item(), g_loss.item())
-            )
-
             batches_done = epoch * len(dataloader) + i
             
 
@@ -207,5 +202,5 @@ def sample_image(generator,n_row, gen_label, latent_dim):
         np.array([lbl for lbl in gen_label for _ in range(n_row)])))
     gen_imgs = generator(z, y)
         #save_image(gen_imgs.data, img_save_path + '/%d.png' % lbl, nrow=n_row, normalize=True)
-    gen_imgs = generator(z, y)
+   # gen_imgs = generator(z, y)
     return gen_imgs

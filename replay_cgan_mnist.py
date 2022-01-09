@@ -1,3 +1,4 @@
+from torchvision.utils import save_image
 from models.CGAN import Generator, Discriminator, train_replayer, weights_init_normal, sample_image
 import torch
 import torchvision
@@ -64,5 +65,8 @@ for task_id in range(tasks_num):
         lib.model_grad_switch(previous_classifier, False)
 
     # train the generator and classifier
+    print("task",task_id)
     generator,discriminator = train_replayer(TrainDataLoaders[task_id], (task_id+1) * 2, writer)
     img = sample_image(generator, 10, list(range(0, (task_id+1) * 2)), 100)
+    save_image(img.data, 'store/%d.png' % task_id, nrow=10, normalize=True)
+            
