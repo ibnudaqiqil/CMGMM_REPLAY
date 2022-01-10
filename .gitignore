@@ -6,3 +6,4 @@ output/*
 *.pickle
 *.pkl
 continualai/*
+*/__pycache__/*
