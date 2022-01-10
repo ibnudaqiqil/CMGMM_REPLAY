@@ -94,6 +94,8 @@ def train_replayer(dataloader, n_classes,writer):
     img_shape =  (channels, img_size, img_size)
 
     cuda = True if torch.cuda.is_available() else False
+    device = torch.device(
+        'cuda') if cuda else torch.device('cpu')
     FloatTensor = torch.cuda.FloatTensor if cuda else torch.FloatTensor
     LongTensor = torch.cuda.LongTensor if cuda else torch.LongTensor
     # Loss function
@@ -126,7 +128,7 @@ def train_replayer(dataloader, n_classes,writer):
     batches_done=0
     for epoch in range(n_epochs):
         for i, (imgs, labels) in enumerate(dataloader):
-
+            imgs, labels = imgs.to(device), labels.to(device)
             batch_size = imgs.shape[0]
 
             # Adversarial ground truths
