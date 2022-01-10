@@ -1,3 +1,4 @@
+import argparse
 from torchvision.utils import save_image
 from models.CGAN import Generator, Discriminator, train_replayer, weights_init_normal, sample_image
 import torch
@@ -13,6 +14,31 @@ import sys
 import copy
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--epochs", type=int, default=100,
+                    help="number of epochs of training")
+parser.add_argument("--batch_size", type=int, default=64,
+                    help="size of the batches")
+parser.add_argument("--lr", type=float, default=0.0002,
+                    help="adam: learning rate")
+parser.add_argument("--b1", type=float, default=0.5,
+                    help="adam: decay of first order momentum of gradient")
+parser.add_argument("--b2", type=float, default=0.999,
+                    help="adam: decay of first order momentum of gradient")
+parser.add_argument("--n_cpu", type=int, default=8,
+                    help="number of cpu threads to use during batch generation")
+parser.add_argument("--latent_dim", type=int, default=100,
+                    help="dimensionality of the latent space")
+parser.add_argument("--n_classes", type=int, default=10,
+                    help="number of classes for dataset")
+parser.add_argument("--img_size", type=int, default=32,
+                    help="size of each image dimension")
+parser.add_argument("--channels", type=int, default=1,
+                    help="number of image channels")
+parser.add_argument("--sample_interval", type=int, default=400,
+                    help="interval between image sampling")
+opt = parser.parse_args()
+print(opt)
 
 writer = SummaryWriter()
 batch_size = num_noise = 64
@@ -98,7 +124,7 @@ for task_id in range(tasks_num):
     # train the generator and classifier
 
     generator, discriminator = train_replayer(
-        TrainDataLoaders, len(task_classes_arr[task_id]), writer)
+        TrainDataLoaders, opt.epochs, len(task_classes_arr[task_id]), writer)
     print("generate image from 0 to ", task_classes_arr[task_id])
     for img_id in task_classes_arr[task_id]:
         img, _ = sample_image(generator, 10, [img_id], n_latent)   
