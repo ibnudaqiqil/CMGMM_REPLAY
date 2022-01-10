@@ -78,24 +78,24 @@ for t in range(5):
     example_num = 2000
     print("TRAINING GENERATOR =============")
     for i in range((t+1)*2):
-        f = open("./store/gmm2/model_"+str(i)+".pickle", "rb")
+        f = open("./store/f2/model_"+str(i)+".pickle", "rb")
         dir_name = "Task "+str(i)
         generator = pickle.load(f)
         f.close()
         digits, _ = generator.sample(48)
-        np.clip(digits, 0, 1, out=digits)
+        #np.clip(digits, 0, 1, out=digits)
         #print(digits_a.shape, digits_b.shape)
-        digits = digits.astype(np.float32)
-        digits[np.abs(digits) < 0.1] = 0.0
+       # digits = digits.astype(np.float32)
+        #digits[np.abs(digits) < 0.1] = 0.0
         #digits[np.abs(digits) < 0.2] = 0.4
         #digits[np.abs(digits) < 0.3] = 0.5
-        digits[np.abs(digits) > 0.7] = 1.0
+        #digits[np.abs(digits) > 0.7] = 1.0
 
 
         digits = digits.reshape(digits.shape[0], 1, 28, 28)
         t = torch.from_numpy(digits)
         grid = torchvision.utils.make_grid(t)
-        plt.imshow(grid.permute(1, 2, 0),cmap='gray')
+        plt.imshow(grid.permute(1, 2, 0))
         plt.show()
         writer.add_image(dir_name, grid, 0)
 '''

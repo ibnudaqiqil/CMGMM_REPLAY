@@ -29,11 +29,13 @@ use_cuda = True
 use_cuda = use_cuda and torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 torch.manual_seed(1)
-
+from torchvision.datasets import FashionMNIST
+transforms = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
+dataset = FashionMNIST('/data', train=True, download=True,transform=transforms)
 # print some MNIST info
-x_train, t_train, x_test, t_test = mnist.load()
+x_train = dataset.data.numpy()
+t_train = dataset.targets.numpy()
 
-print(f'Size of training data is: {t_train.shape[0]}, size of test data: {t_test.shape[0]}')
 
 
 # #############################################################################
@@ -222,28 +224,21 @@ tasks_num = len(task_classes_arr)  # 5
 task_data = []
 gmm_concept=[]
 task_data_with_overlap = []
-for i, task_classes in enumerate(task_classes_arr):
-    train_mask = np.isin(t_train, task_classes)
-    test_mask = np.isin(t_test, task_classes)
-    x_train_task, t_train_task = x_train[train_mask], t_train[train_mask]
-    x_test_task, t_test_task = x_test[test_mask], t_test[test_mask]
 
-    task_data.append((x_train_task, t_train_task, x_test_task, t_test_task))
-    task_data_with_overlap.append((x_train_task, t_train_task - (i * 2),
-                                   x_test_task, t_test_task - (i * 2)))
+ 
 #train or reload GMM
 for i, task_classes in enumerate(concept_num):
     train_mask = np.isin(t_train, task_classes)
-    test_mask = np.isin(t_test, task_classes)
+    #test_mask = np.isin(t_test, task_classes)
 
     x_train_task, t_train_task = x_train[train_mask], t_train[train_mask]
-    x_test_task, t_test_task = x_test[test_mask], t_test[test_mask]
+   # x_test_task, t_test_task = x_test[test_mask], t_test[test_mask]
     #print(x_train_task[0][0])
     gmm = train_gmm(x_train_task,  "model_"+str(task_classes))
     gmm_concept.append(gmm)
 
 #accs_naive = train_singlehead()
-accs_rehearsal_all = train_singlehead(0.8)
+#accs_rehearsal_all = train_singlehead(0.8)
 
 
 #accs_fine_grid = np.array(accs_naive)

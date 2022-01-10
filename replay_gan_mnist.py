@@ -117,7 +117,8 @@ for t in range(5):
             optim_s.step()
 
     ### Evaluate solver
-    solver_acc_dict[t+1] = lib.solver_evaluate(t, gen, solver, ratio, device, TestDataLoaders)
+    solver_acc_dict[t+1] = lib.solver_evaluate(
+        t, generator, solver, ratio, device, TestDataLoaders)
     writer.add_scalar('Accuracy/test', solver_acc_dict[t+1], t)
 
 
