@@ -103,7 +103,7 @@ def train_replayer(dataloader, n_classes,writer):
     generator = Generator(n_classes, img_shape, latent_dim)
     discriminator = Discriminator(n_classes, img_shape)
 
-    if torch.cuda.is_available():
+    if cuda:
         generator.cuda()
         discriminator.cuda()
         adversarial_loss.cuda()

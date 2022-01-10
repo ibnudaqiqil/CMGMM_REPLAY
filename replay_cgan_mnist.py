@@ -85,10 +85,7 @@ for task_id in range(tasks_num):
         TestDataLoaders = torch.utils.data.DataLoader(TestDataSet[task_id],
                                                     batch_size=batch_size,
                                                     shuffle=False)
-        # put data into GPU entirely
-        train_set.train_data.to(torch.device("cuda:0"))
-        train_set.train_labels.to(torch.device("cuda:0"))
-        #train_data.train_labels.to(torch.device("cuda:0"))
+
         print("train replayer using psudodata nclass= ", (task_id+1) * 2)
     else:
         TrainDataLoaders = torch.utils.data.DataLoader(TrainDataSet[task_id],
