@@ -85,7 +85,7 @@ def train_replayer(dataloader, n_classes,writer):
     learning_rate = 0.0002
     beta1 = 0.5  # decay of first order momentum of gradient'
     beta2 = 0.999  # decay of second order momentum of gradient
-    n_epochs =2
+    n_epochs =10
     batch_size = 64
     sample_interval= 10
     latent_dim = 100

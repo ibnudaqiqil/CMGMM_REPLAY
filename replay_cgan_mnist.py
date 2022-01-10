@@ -99,7 +99,8 @@ for task_id in range(tasks_num):
     generator, discriminator = train_replayer(
         TrainDataLoaders, len(task_classes_arr[task_id]), writer)
     print("generate image from 0 to ", task_classes_arr[task_id])
-    img, _ = sample_image(generator, 10, task_classes_arr[task_id], n_latent)
-   
-    save_image(img.data, 'store/x%d.png' % task_id, nrow=10, normalize=True)
+    for img_id in task_classes_arr[task_id]:
+        img, _ = sample_image(generator, 10, [img_id], n_latent)   
+        save_image(img.data, 'store/x%d-%d.png' %
+                   (task_id, img_id), nrow=10, normalize=True)
             
