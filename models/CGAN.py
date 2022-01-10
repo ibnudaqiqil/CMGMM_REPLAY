@@ -124,6 +124,7 @@ def train_replayer(dataloader, n_epochs, n_classes, writer):
     #  Training
     # ----------
     batches_done=0
+    dataloader.to(device)
     for epoch in range(n_epochs):
         for i, (imgs, labels) in enumerate(dataloader):
             imgs, labels = imgs.to(device), labels.to(device)
