@@ -85,7 +85,7 @@ def train_replayer(dataloader, n_classes,writer):
     learning_rate = 0.0002
     beta1 = 0.5  # decay of first order momentum of gradient'
     beta2 = 0.999  # decay of second order momentum of gradient
-    n_epochs =10
+    n_epochs =2
     batch_size = 64
     sample_interval= 10
     latent_dim = 100
@@ -197,10 +197,11 @@ def sample_image(generator,n_row, gen_label, latent_dim):
     z = Variable(FloatTensor(np.random.normal(
         0, 1, (n_row*len(gen_label), latent_dim))))
     # Get labels ranging from 0 to n_classes for n rows
-  
+   
     y = Variable(LongTensor(
         np.array([lbl for lbl in gen_label for _ in range(n_row)])))
     gen_imgs = generator(z, y)
         #save_image(gen_imgs.data, img_save_path + '/%d.png' % lbl, nrow=n_row, normalize=True)
    # gen_imgs = generator(z, y)
+    print(y)
     return gen_imgs,y

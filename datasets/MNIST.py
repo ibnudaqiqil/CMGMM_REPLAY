@@ -96,6 +96,7 @@ class MNIST_IncrementalDataset(torchvision.datasets.MNIST):
             return len(self.TestLabels)
 
     def appendData(self,psudodata,label):
+        
         for i in range(len(psudodata)):
             _data = psudodata[i].cpu().detach().numpy()
             
