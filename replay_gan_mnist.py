@@ -82,7 +82,7 @@ for t in range(5):
     lib.init_params(solver)
     TrainDataLoader = TrainDataLoaders[t]
     generator,discriminator = models.train_generator(
-        TrainDataLoader, ratio, num_noise, pre_gen, writer)
+        TrainDataLoader, ratio, num_noise, pre_gen, writer, epochs)
     optim_s = torch.optim.Adam(solver.parameters(), lr=0.001)
 
          

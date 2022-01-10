@@ -236,11 +236,11 @@ def sample_noise(batch_size, N_noise, device='cpu'):
     return torch.randn(batch_size, N_noise).to(device)
 
 
-def train_generator(TrainDataLoader, ratio, num_noise, prev_generator, writer):
+def train_generator(TrainDataLoader, ratio, num_noise, prev_generator, writer, epochs):
     #num_noise =48
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     ld = 10
-    epochs = 10
+    #epochs = 10
     learning_rate = 0.001
     generator = Generator_Conv(input_node_size=num_noise, output_shape=(
         1, 28, 28), hidden_node_size=256, hidden_node_num=2)
